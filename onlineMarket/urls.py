@@ -24,6 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('onlineMarket.api.urls')),
     # path('register', views.create_user, name='register'),
-    path('products', views.product_view, name='products')
+    path('products', views.product_view, name='products'),
+    path("get-details", views.UserDetailAPI.as_view()),
+    path('register',views.RegisterUserAPIView.as_view()),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #new

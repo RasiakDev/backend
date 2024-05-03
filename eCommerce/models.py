@@ -19,7 +19,6 @@ units = (
     ("ml", "ml"),
     ("Lt", "Lt"),
     ("Cope", "Cope")
-
 )
 
 class Category(models.Model):
@@ -29,13 +28,17 @@ class Category(models.Model):
         return self.category
 
 class Product(models.Model):
-    name=models.CharField(max_length=255)
-    category=models.ForeignKey(Category, on_delete=models.CASCADE)
+    name=models.CharField(max_length=255, null=True)
+    category=models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
     description=models.TextField(max_length=255, null=True, blank=True)
-    barcode=models.CharField(max_length=13)
-    unit=models.CharField(max_length=10, choices=units)
-    size=models.IntegerField()
-    price=models.IntegerField()
+    # barcode=models.CharField(max_length=13)
+    unit=models.CharField(max_length=10, choices=units, null=True)
+    quantity=models.IntegerField( null=True)
+    # size=models.IntegerField()
+    price=models.FloatField( null=True)
+    total=models.FloatField( null=True)
+    reviews=models.FloatField( null=True)
+    reviewCount=models.IntegerField( null=True)
     image=models.ImageField(upload_to=f'products', null=True)
 
     def __str__(self) -> str:
@@ -70,7 +73,7 @@ class User(AbstractUser, PermissionsMixin):
         null=True
     )
     # phone = models.CharField(max_length=14)
-    name = models.CharField(max_length=100, default="XXXX")
+    name = models.CharField(max_length=100, null=True)
     # last_name = models.CharField(max_length=100)
     # city=models.CharField(max_length=15,choices = cities, default='Durres')
     # adress=models.CharField(max_length=255)

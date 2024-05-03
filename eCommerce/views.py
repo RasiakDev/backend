@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from .models import Post, Product, Category
-from .serializers import PostSerializer, ProductSerializer
+from .serializers import PostSerializer, ProductSerializer, UserSerializer, RegisterSerializer
 from django.contrib.auth import login, authenticate
 from django.shortcuts import redirect, render
 from .forms.userForms import UserCreationForm
@@ -9,10 +9,30 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Product
+from .models import Product, User
 import base64
 import os
+from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import AllowAny
+from rest_framework import generics
 
+
+
+
+# Class based view to Get User Details using Token Authentication
+class UserDetailAPI(APIView):
+  authentication_classes = (TokenAuthentication,)
+  permission_classes = (AllowAny,)
+  def get(self,request,*args,**kwargs):
+    user = User.objects.get(id=request.user.id)
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
+
+#Class based view to register user
+class RegisterUserAPIView(generics.CreateAPIView):
+  permission_classes = (AllowAny,)
+  serializer_class = RegisterSerializer
 
 class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
@@ -41,6 +61,13 @@ class ProductViewSet(ModelViewSet):
     queryset=Product.objects.all()
     serializer_class=ProductSerializer
     parser_classes = (MultiPartParser, FormParser)
+
+    def get_queryset(self):
+       qs = super().get_queryset()
+       only_missing = str(self.request.query_params.get('category')).capitalize()
+       if only_missing:
+           return qs.filter(category=only_missing)
+       return qs 
 
     def create(self, request, *args, **kwargs):
         name = request.data["name"]
